@@ -11,5 +11,13 @@ spring:
           issuer-uri: http://localhost:9000/
           jwk-set-uri: http://localhost:9000/oauth2/jwks
 
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.security: TRACE
+    org.springframework.security.oauth2: TRACE
+
+
 
 
