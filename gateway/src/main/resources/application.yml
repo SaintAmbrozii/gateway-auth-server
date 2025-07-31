@@ -1,0 +1,93 @@
+server:
+  port: 8080
+  reactive:
+    session:
+      cookie:
+        name: GATEWAY-ClIENT
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: gateway
+  data:
+    redis:
+      host: redis
+      password: password
+      port: 6379
+      lettuce:
+        pool:
+          max-idle: 8
+  session:
+    redis:
+      flush-mode: on_save
+      namespace: gateway:session
+      repository-type: default
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: messages
+          uri: http://127.0.0.1:8070
+          predicates:
+            - Path=/messages/**
+          filters:
+            - TokenRelay=
+            - RemoveRequestHeader=Cookie
+
+        - id: resource
+          uri: http://127.0.0.1:8090
+          predicates:
+             - Path=/resource/**
+          filters:
+            - SaveSession
+            - TokenRelay=
+
+
+
+      server:
+        webflux:
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+
+
+
+
+
+
+  security:
+    oauth2:
+      client:
+        registration:
+          gateway-oidc:
+            provider: gateway-client-provider
+            client-id: gateway
+            client-secret: secret
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - openid
+              - profile
+              - email
+              - message.read
+              - message.write
+              - offline_access
+            client-name: gateway-oidc
+        provider:
+          gateway-client-provider:
+            issuer-uri: http://localhost:9000
+            jwk-set-uri: http://localhost:9000/oauth2/jwks
+            user-name-attribute: sub
+
+
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.security: TRACE
+    org.springframework.security.oauth2: TRACE
+    org.springframework.cloud.gateway: INFO
