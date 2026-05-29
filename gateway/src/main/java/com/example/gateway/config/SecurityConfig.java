@@ -1,35 +1,17 @@
 package com.example.gateway.config;
 
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientProvider;
 import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientProviderBuilder;
-import org.springframework.security.oauth2.client.oidc.authentication.ReactiveOidcIdTokenDecoderFactory;
 import org.springframework.security.oauth2.client.oidc.web.server.logout.OidcClientInitiatedServerLogoutSuccessHandler;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.DefaultReactiveOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers;
@@ -38,13 +20,6 @@ import org.springframework.security.oauth2.client.web.server.DefaultServerOAuth2
 import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.server.WebSessionServerOAuth2AuthorizedClientRepository;
-import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.ReactiveJwtDecoderFactory;
-import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
-import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.server.DelegatingServerAuthenticationEntryPoint;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
@@ -80,13 +55,10 @@ import java.util.Map;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private ReactiveClientRegistrationRepository clientRegistrationRepository;
 
 
     @Bean
     SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity httpSecurity,
-                                                  // ReactiveClientRegistrationRepository reactiveClientRegistration,
                                                   ServerOAuth2AuthorizationRequestResolver resolver,
                                                   ServerOAuth2AuthorizedClientRepository auth2AuthorizedClientRepository,
                                                   ServerLogoutSuccessHandler logoutSuccessHandler,
@@ -121,16 +93,8 @@ public class SecurityConfig {
                                 .logoutHandler(logoutHandler)
                 )
                 .csrf(csrf -> csrf
-                        // Используем куки для хранения токенов CSRF. Для того, чтобы Angular
-                        // и другие приложения на JS поддерживали такой механизм, необходимо
-                        // установить атрибут куки httpOnly = false.
-                        // По умолчанию токены CSRF хранятся в веб-сессии.
                         .csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse())
-                        // Токены CSRF доступны в качестве атрибута ServerWebExchange, это достигается
-                        // за счет наличия в контексте спринга реализации интерфейса ServerCsrfTokenRequestHandler,
-                        // по умолчанию используется XorServerCsrfTokenRequestAttributeHandler, который
-                        // умеет маскировать токены (c помощью XOR операции) и получать их значение обратно. В данном случае,
-                        // конфигурация полностью совпадает с дефолтной и приведена здесь в качестве примера.
+                      // Настраивается стандартный вариант хранения токенов csrf
                         .csrfTokenRequestHandler(new XorServerCsrfTokenRequestAttributeHandler()))
 
                 .exceptionHandling(
@@ -176,13 +140,6 @@ public class SecurityConfig {
                 )
         );
     }
-  //  @Bean
- //   public ReactiveJwtDecoderFactory<ClientRegistration> idTokenDecoderFactory() {
- //       ReactiveOidcIdTokenDecoderFactory idTokenDecoderFactory = new ReactiveOidcIdTokenDecoderFactory();
-        // RSA is the default algorithm, but we are using HS256
-//        idTokenDecoderFactory.setJwsAlgorithmResolver(clientRegistration -> SignatureAlgorithm.RS256);
- //       return idTokenDecoderFactory;
- //   }
 
 
     private ServerAuthenticationEntryPoint authenticationEntryPoint() {

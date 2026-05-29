@@ -28,7 +28,7 @@ public class ResourceServerConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/resource/**")
-                        .hasAnyAuthority("SCOPE_message.read","SCOPE_message.write")
+                        .hasAnyAuthority("ROLE_USER","ROLE_ADMIN")
                         .anyRequest().authenticated()
                 )
 
@@ -47,19 +47,18 @@ public class ResourceServerConfig {
     }
 
 
-//    @Bean
- //   public JwtAuthenticationConverter jwtAuthenticationConverter() {
- //       JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        // 设置 JWT 中用于标识权限的字段名为 "authorities"
- //       grantedAuthoritiesConverter.setAuthoritiesClaimName("authorities");
-        // 不添加前缀，默认会加 "SCOPE_"，这里设置为空字符串
-  //      grantedAuthoritiesConverter.setAuthorityPrefix("");
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        // берет роли из клеймс roles
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+        grantedAuthoritiesConverter.setAuthorityPrefix("");
 
-  //      JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        // 设置自定义的权限转换器
- //       jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
-///        return jwtAuthenticationConverter;
-//    }
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        // устанавливает конвертер ролей
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
+    }
 
 
 
