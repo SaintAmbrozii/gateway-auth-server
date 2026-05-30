@@ -57,5 +57,6 @@ pipeline {
                 sh 'ls -la'
                 echo 'Cleanup completed'
             }
+        }
     }
 }
