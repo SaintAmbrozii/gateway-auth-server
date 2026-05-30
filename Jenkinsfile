@@ -4,8 +4,6 @@ pipeline {
         stage('Prepare') {
             steps {
                 echo 'Preparing workspace...'
-            }
-            steps {
                 sh 'mkdir -p build logs temp'
                 sh 'mkdir -p build logs build'
                 sh 'mkdir -p build logs temp'
@@ -15,27 +13,18 @@ pipeline {
         stage('Build') {
             steps {
                  echo 'Building application...'
-            }
-            steps {
-                 echo 'Building application...'
                  sh 'echo "Build version: 1.0.0" > build/version.txt'
-            }
-            steps {
-                sh 'date >> build/version.txt'
-                echo 'Build completed'
+                 echo 'Build completed'
             }
         }
         stage ('Verify') {
             steps {
                 echo 'Verifying build..'
-            }
-            steps {
                 sh 'cat build/version.txt'
-            }
-            steps {
                 sh 'ls -la build/'
                 echo 'Verification completed'
             }
+
         }
         stage('System Info') {
             steps {
@@ -48,7 +37,6 @@ pipeline {
                 sh 'ls -la'
             }
         }
-
 
         stage('Cleanup') {
             steps {
