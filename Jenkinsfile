@@ -17,35 +17,35 @@ pipeline {
                  echo 'Building application...'
             }
             steps {
-                  echo 'Building application...'
-                  sh 'echo "Build version: 1.0.0" > build/version.txt'
+                 echo 'Building application...'
+                 sh 'echo "Build version: 1.0.0" > build/version.txt'
             }
             steps {
-                  sh 'date >> build/version.txt'
-                  echo 'Build completed'
+                sh 'date >> build/version.txt'
+                echo 'Build completed'
             }
         }
         stage ('Verify') {
             steps {
-                  echo 'Verifying build..'
+                echo 'Verifying build..'
             }
             steps {
-                  sh 'cat build/version.txt'
+                sh 'cat build/version.txt'
             }
             steps {
-                  sh 'ls -la build/'
-                  echo 'Verification completed'
+                sh 'ls -la build/'
+                echo 'Verification completed'
             }
         }
         stage('System Info') {
             steps {
-                  echo 'Информация о системе:'
-                  echo 'Операционная система:'
-                  sh 'uname -a'
-                  echo 'Текущая директория:'
-                  sh 'pwd'
-                  echo 'Список файлов:'
-                  sh 'ls -la'
+                echo 'Информация о системе:'
+                echo 'Операционная система:'
+                sh 'uname -a'
+                echo 'Текущая директория:'
+                sh 'pwd'
+                echo 'Список файлов:'
+                sh 'ls -la'
             }
         }
 
