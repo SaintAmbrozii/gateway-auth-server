@@ -4,16 +4,14 @@ pipeline {
 
     environment {
       DEPLOY_ENV = 'staging'
-      }
+    }
 
     stages {
-
         stage('Build') {
             steps {
                 echo 'Building application...'
                 git branch --show-current
             }
-
         }
         stage('Deploy to Staging') {
             when {
@@ -26,7 +24,7 @@ pipeline {
         stage ('Deploy to Production') {
             when {
                 environment name: 'DEPLOY_ENV', value: 'production'
-                    }
+            }
             steps {
                 echo 'Имя переменной DEPLOY_ENV: ${env.DEPLOY_ENV}'
             }
