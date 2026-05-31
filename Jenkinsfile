@@ -10,7 +10,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building application...'
-                git branch --show-current
+                echo "Текущая ветка: ${env.BRANCH_NAME}"
             }
         }
         stage('Deploy to Staging') {
