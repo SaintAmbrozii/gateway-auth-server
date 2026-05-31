@@ -1,50 +1,62 @@
 pipeline {
-    agent any
-    stages {
-        stage('Prepare') {
-            steps {
-                echo 'Preparing workspace...'
-                sh 'mkdir -p build logs temp'
-                sh 'mkdir -p build logs build'
-                sh 'mkdir -p build logs temp'
-            }
 
-        }
+    agent any
+
+    environment {
+      DEPLOY_ENV = 'staging'
+      }
+
+    stages {
+
         stage('Build') {
             steps {
-                 echo 'Building application...'
-                 sh 'echo "Build version: 1.0.0" > build/version.txt'
-                 echo 'Build completed'
-            }
-        }
-        stage ('Verify') {
-            steps {
-                echo 'Verifying build..'
-                sh 'cat build/version.txt'
-                sh 'ls -la build/'
-                echo 'Verification completed'
+                echo 'Building application...'
+                git branch --show-current
             }
 
         }
-        stage('System Info') {
+        stage('Deploy to Staging') {
+            when {
+                environment name: 'DEPLOY_ENV', value: 'standing'
+            }
             steps {
-                echo 'Информация о системе:'
-                echo 'Операционная система:'
-                sh 'uname -a'
-                echo 'Текущая директория:'
-                sh 'pwd'
-                echo 'Список файлов:'
-                sh 'ls -la'
+                echo 'Имя переменной DEPLOY_ENV: ${env.DEPLOY_ENV}'
+            }
+        }
+        stage ('Deploy to Production') {
+            when {
+                environment name: 'DEPLOY_ENV', value: 'production'
+                    }
+            steps {
+                echo 'Имя переменной DEPLOY_ENV: ${env.DEPLOY_ENV}'
+            }
+        }
+        stage('Test') {
+            when {
+                allOf {
+                    branch 'main'
+                    environment name: 'DEPLOY_ENV', value: 'staging'
+                    expression { env.BUILD_NUMBER.toInteger() % 2 == 0 }
+                }
+            }
+            steps {
+                echo 'Deploying to the staging environment...'
+             }
+
+        }
+        stage('Weekend Task') {
+            when {
+                expression {
+                    def day = new Date().format('EEEE')
+                    return day == 'Saturday' || day == 'Sunday'
+                }
+            }
+            steps {
+                echo "This is a weekend build!"
+                echo "Day: ${new Date().format('EEEE, MMMM dd, yyyy')}"
             }
         }
 
-        stage('Cleanup') {
-            steps {
-                echo 'Cleaning up temporary files...'
-                sh 'rm -rf temp logs'
-                sh 'ls -la'
-                echo 'Cleanup completed'
-            }
-        }
+
     }
 }
